@@ -4,31 +4,31 @@ const carrito = document.querySelector('#carrito');
 const templateItemCarrito = document.querySelector('#template-item-carrito').content;
 const fragment = document.createDocumentFragment();
 
-// -------------------- Crear un objeto global que almacena la compra
-const carritoObjeto = {};
+// -------------------- Crear un array global que almacena la compra
+const carritoArray = [];
 
 // -------------------- Declaracion de funciones
 const crearItem = (item) => {
     // -------------------- Crear el nuevo item
-    nuevoItem = {
-        id: item,
-        descripcion: item,
-        cantidad: 1
-    };
+    const nuevoItem = [item, 1];
 
-    guardarCarrito(nuevoItem);
-    leerCarrito();
+    if(carritoArray.length === 0) {
+        carritoArray.push(nuevoItem);
+    }
+    else {
+
+    }
+
+    
+
+    carritoArray = compraActual;
+
+    /* guardarCarrito(nuevoItem);
+    leerCarrito(); */
 };
 
 const guardarCarrito = (nuevoItem) => {
-    // -------------------- Incrementar la cantidad del item si ya se encuentra agregado
-    if(carritoObjeto.hasOwnProperty(nuevoItem.id)) {
-        carritoObjeto[nuevoItem.id].cantidad++;
-    }
-    else {
-        // -------------------- Agregar el nuevo item al carrito
-        carritoObjeto[nuevoItem.id] = nuevoItem;
-    }
+    
 };
 
 const leerCarrito = () => {
@@ -36,7 +36,7 @@ const leerCarrito = () => {
     carrito.textContent = '';
     
     // -------------------- Obtener un array con los valores del objeto
-    Object.values(carritoObjeto).forEach(item => {
+    Object.values(carritoArray).forEach(item => {
         // -------------------- Crear los objetos de la plantilla
         const clonTemplateItemCarrito = templateItemCarrito.firstElementChild.cloneNode(true);
 
