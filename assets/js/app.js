@@ -30,7 +30,7 @@ const guardarCarrito = (nuevoItem) => {
     }
     else {
         // -------------------- Agregar el nuevo item al carrito
-        carritoObjeto[nuevoItem.descripcion] = nuevoItem;
+        carritoObjeto[nuevoItem.id] = nuevoItem;
     }
 
     // -------------------- Formatear el carrito
@@ -41,7 +41,7 @@ const leerCarrito = () => {
     // -------------------- Obtener un array con los valores del objeto
     Object.values(carritoObjeto).forEach(item => {
         // -------------------- Crear los objetos de la plantilla
-        const clonTemplateItemCarrito = templateItemCarrito.cloneNode(true);
+        const clonTemplateItemCarrito = templateItemCarrito.firstElementChild.cloneNode(true);
 
         clonTemplateItemCarrito.querySelector('li span.lead').textContent = item.descripcion;
         clonTemplateItemCarrito.querySelector('li span.badge').textContent = item.cantidad;
