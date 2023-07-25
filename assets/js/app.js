@@ -19,6 +19,11 @@ const crearItem = (item) => {
         cantidad: 1
     };
 
+    guardarCarrito(nuevoItem);
+    leerCarrito();
+};
+
+const guardarCarrito = (nuevoItem) => {
     // -------------------- Incrementar la cantidad del item si ya se encuentra agregado
     if(carritoObjeto.hasOwnProperty(nuevoItem.id)) {
         carritoObjeto[nuevoItem.id].cantidad++;
@@ -30,11 +35,9 @@ const crearItem = (item) => {
 
     // -------------------- Formatear el carrito
     carrito.textContent = '';
-
-    pintarCarrito();
 };
 
-const pintarCarrito = () => {
+const leerCarrito = () => {
     // -------------------- Obtener un array con los valores del objeto
     Object.values(carritoObjeto).forEach(item => {
         // -------------------- Crear los objetos de la plantilla
