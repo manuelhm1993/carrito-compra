@@ -10,7 +10,7 @@ const carritoObjeto = {};
 // -------------------- Declaracion de funciones
 const crearItem = (item) => {
     // -------------------- Crear el nuevo item
-    nuevoItem = {
+    const nuevoItem = {
         id: item,
         descripcion: item,
         cantidad: 1
@@ -23,12 +23,10 @@ const crearItem = (item) => {
 const guardarCarrito = (nuevoItem) => {
     // -------------------- Incrementar la cantidad del item si ya se encuentra agregado
     if(carritoObjeto.hasOwnProperty(nuevoItem.id)) {
-        carritoObjeto[nuevoItem.id].cantidad++;
+        nuevoItem.cantidad = carritoObjeto[nuevoItem.id].cantidad + 1;
     }
-    else {
-        // -------------------- Agregar el nuevo item al carrito
-        carritoObjeto[nuevoItem.id] = nuevoItem;
-    }
+    // -------------------- Agregar el nuevo item al carrito
+    carritoObjeto[nuevoItem.id] = nuevoItem;
 };
 
 const leerCarrito = () => {
