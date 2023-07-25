@@ -29,12 +29,12 @@ const guardarCarrito = (nuevoItem) => {
         // -------------------- Agregar el nuevo item al carrito
         carritoObjeto[nuevoItem.id] = nuevoItem;
     }
-
-    // -------------------- Formatear el carrito
-    carrito.textContent = '';
 };
 
 const leerCarrito = () => {
+    // -------------------- Formatear el carrito
+    carrito.textContent = '';
+    
     // -------------------- Obtener un array con los valores del objeto
     Object.values(carritoObjeto).forEach(item => {
         // -------------------- Crear los objetos de la plantilla
