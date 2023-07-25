@@ -9,9 +9,6 @@ const carritoObjeto = {};
 
 // -------------------- Declaracion de funciones
 const crearItem = (item) => {
-    // -------------------- Traer la compra
-    const itemsCompra = carrito.querySelectorAll('li');
-
     // -------------------- Crear el nuevo item
     nuevoItem = {
         id: item,
