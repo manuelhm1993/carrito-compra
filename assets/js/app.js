@@ -4,8 +4,8 @@ const carrito = document.querySelector('#carrito');
 const templateItemCarrito = document.querySelector('#template-item-carrito').content;
 const fragment = document.createDocumentFragment();
 
-// -------------------- Crear un objeto global que almacena la compra
-const carritoObjeto = {};
+// -------------------- Crear un array global que almacena la compra
+const carritoArray = [];
 
 // -------------------- Declaracion de funciones
 const crearItem = (item) => {
@@ -17,24 +17,23 @@ const crearItem = (item) => {
     };
 
     guardarCarrito(nuevoItem);
-    leerCarrito();
+    leerCarrito(carritoArray);
 };
 
 const guardarCarrito = (nuevoItem) => {
-    // -------------------- Incrementar la cantidad del item si ya se encuentra agregado
-    if(carritoObjeto.hasOwnProperty(nuevoItem.id)) {
-        nuevoItem.cantidad = carritoObjeto[nuevoItem.id].cantidad + 1;
-    }
-    // -------------------- Agregar el nuevo item al carrito
-    carritoObjeto[nuevoItem.id] = nuevoItem;
+    // -------------------- Comprobar si el producto seleccionado existe en el carrito
+    const indiceItem = carritoArray.findIndex((item) => item.id === nuevoItem.id);
+
+    // -------------------- Si el item no existe en el carrito, se agrega al final en caso contrario incrementa la cantidad
+    (indiceItem === -1) ? carritoArray.push(nuevoItem) : carritoArray[indiceItem].cantidad++;
 };
 
-const leerCarrito = () => {
+const leerCarrito = (arrayCompra) => {
     // -------------------- Formatear el carrito
     carrito.textContent = '';
     
-    // -------------------- Obtener un array con los valores del objeto
-    Object.values(carritoObjeto).forEach(item => {
+    // -------------------- Iterar el array y pintar los elementos en el DOM usando el template
+    arrayCompra.forEach(item => {
         // -------------------- Crear los objetos de la plantilla
         const clonTemplateItemCarrito = templateItemCarrito.firstElementChild.cloneNode(true);
 
