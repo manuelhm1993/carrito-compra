@@ -10,31 +10,35 @@ const carritoArray = [];
 // -------------------- Declaracion de funciones
 const crearItem = (item) => {
     // -------------------- Crear el nuevo item
-    const nuevoItem = [item, 1];
+    const nuevoItem = {
+        id: item,
+        descripcion: item,
+        cantidad: 1
+    };
 
     guardarCarrito(nuevoItem);
-    leerCarrito();
+    leerCarrito(carritoArray);
 };
 
 const guardarCarrito = (nuevoItem) => {
     // -------------------- Comprobar si el producto seleccionado existe en el carrito
-    const itemSeleccionado = carritoArray.findIndex((item) => item[0] === nuevoItem[0]);
+    const indiceItem = carritoArray.findIndex((item) => item.id === nuevoItem.id);
 
     // -------------------- Si el item no existe en el carrito, se agrega al final en caso contrario incrementa la cantidad
-    (itemSeleccionado === -1) ? carritoArray.push(nuevoItem) : carritoArray[itemSeleccionado][1]++;
+    (indiceItem === -1) ? carritoArray.push(nuevoItem) : carritoArray[indiceItem].cantidad++;
 };
 
-const leerCarrito = () => {
+const leerCarrito = (arrayCompra) => {
     // -------------------- Formatear el carrito
     carrito.textContent = '';
     
     // -------------------- Iterar el array y pintar los elementos en el DOM usando el template
-    carritoArray.forEach(item => {
+    arrayCompra.forEach(item => {
         // -------------------- Crear los objetos de la plantilla
         const clonTemplateItemCarrito = templateItemCarrito.firstElementChild.cloneNode(true);
 
-        clonTemplateItemCarrito.querySelector('li span.lead').textContent = item[0];
-        clonTemplateItemCarrito.querySelector('li span.badge').textContent = item[1];
+        clonTemplateItemCarrito.querySelector('li span.lead').textContent = item.descripcion;
+        clonTemplateItemCarrito.querySelector('li span.badge').textContent = item.cantidad;
 
         fragment.appendChild(clonTemplateItemCarrito);
     });
