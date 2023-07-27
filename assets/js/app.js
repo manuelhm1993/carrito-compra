@@ -56,15 +56,11 @@ const pintarCarrito = () => {
         // -------------------- Calcular los totales en js y no en el objeto para seguir un orden lógico
         clonTemplateItemCarrito.querySelector('li div p.lead span').textContent = item.cantidad * item.precio;
 
-        // -------------------- Botones de control de cantidad
-        const botonAumentar = clonTemplateItemCarrito.querySelector('li div .btn.btn-sm.btn-success');
-        const botonDisminuir = clonTemplateItemCarrito.querySelector('li div .btn.btn-sm.btn-danger');
-
-        // -------------------- Agregar los datasets
-        botonAumentar.setAttribute('data-item', item.id);
-        botonAumentar.setAttribute('data-precio', item.precio);
-        botonDisminuir.setAttribute('data-item', item.id);
-        botonDisminuir.setAttribute('data-precio', item.precio);
+        // -------------------- Botones de control de cantidad se capturan y se les agregan los datasets
+        clonTemplateItemCarrito.querySelectorAll('li div .btn.btn-sm').forEach((boton) => {
+            boton.setAttribute('data-item', item.id);
+            boton.setAttribute('data-precio', item.precio);
+        });
 
         fragmentCarrito.appendChild(clonTemplateItemCarrito);
     });
