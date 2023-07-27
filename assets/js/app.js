@@ -21,55 +21,50 @@ const crearItem = (item) => {
         id: item.descripcion,
         descripcion: item.descripcion,
         cantidad: 1,
-        precio: item.precio,
-        total: 0
+        precio: item.precio
     };
 
     guardarCarrito(nuevoItem);
-    leerCarrito(carritoArray);
-};
-
-const devolverIndiceItem = (nuevoItem) => {
-    return carritoArray.findIndex((item) => item.id === nuevoItem.id);
+    leerCarrito();
 };
 
 const guardarCarrito = (nuevoItem) => {
     // -------------------- Comprobar si el producto seleccionado existe en el carrito
-    const indiceItem = devolverIndiceItem(nuevoItem);
+    const indiceItem = carritoArray.findIndex((item) => item.id === nuevoItem.id);
 
     // -------------------- Si el item no existe en el carrito, se agrega al final en caso contrario incrementa la cantidad
-    if(indiceItem === -1) {
-        carritoArray.push(nuevoItem);
-
-        const indiceAgregado = devolverIndiceItem(nuevoItem);
-        
-        carritoArray[indiceAgregado].total = carritoArray[indiceAgregado].cantidad * nuevoItem.precio;
-    }
-    else {
-        carritoArray[indiceItem].cantidad++;
-
-        // -------------------- Luego de modificar la cantidad, se calcula cantidad * precio para el total
-        carritoArray[indiceItem].total = carritoArray[indiceItem].cantidad * nuevoItem.precio;
-    }
+    (indiceItem === -1) ? carritoArray.push(nuevoItem) : carritoArray[indiceItem].cantidad++;
 };
 
-const leerCarrito = (arrayCompra) => {
-    pintarCarrito(arrayCompra);
-    pintarTotalCompra(arrayCompra);
+const leerCarrito = () => {
+    pintarCarrito();
+    pintarTotalCompra();
 };
 
-const pintarCarrito = (arrayCompra) => {
+const pintarCarrito = () => {
     // -------------------- Formatear el carrito
     carrito.textContent = '';
     
     // -------------------- Iterar el array y pintar los elementos en el DOM usando el template
-    arrayCompra.forEach(item => {
+    carritoArray.forEach(item => {
         // -------------------- Como son varios nodos, no se puede usar ni firstElementChild ni lastElementChild
         const clonTemplateItemCarrito = templateItemCarrito.cloneNode(true);
 
         clonTemplateItemCarrito.querySelector('li span.lead').textContent = item.descripcion;
         clonTemplateItemCarrito.querySelector('li span.badge').textContent = item.cantidad;
-        clonTemplateItemCarrito.querySelector('li div p.lead span').textContent = item.total;
+
+        // -------------------- Calcular los totales en js y no en el objeto para seguir un orden lógico
+        clonTemplateItemCarrito.querySelector('li div p.lead span').textContent = item.cantidad * item.precio;
+
+        // -------------------- Botones de control de cantidad
+        const botonAumentar = clonTemplateItemCarrito.querySelector('li div .btn.btn-sm.btn-success');
+        const botonDisminuir = clonTemplateItemCarrito.querySelector('li div .btn.btn-sm.btn-danger');
+
+        // -------------------- Agregar los datasets
+        botonAumentar.setAttribute('data-item', item.id);
+        botonAumentar.setAttribute('data-precio', item.precio);
+        botonDisminuir.setAttribute('data-item', item.id);
+        botonDisminuir.setAttribute('data-precio', item.precio);
 
         fragmentCarrito.appendChild(clonTemplateItemCarrito);
     });
@@ -77,22 +72,23 @@ const pintarCarrito = (arrayCompra) => {
     carrito.appendChild(fragmentCarrito);
 };
 
-const devolverTotalCompra = (arrayCompra) => {
+const devolverTotalCompra = () => {
     let totalCompra = 0;
 
-    arrayCompra.forEach((item) => {
-        totalCompra += item.total;
+    carritoArray.forEach((item) => {
+        totalCompra += (item.cantidad * item.precio);
     });
 
     return totalCompra;
 };
 
-const pintarTotalCompra = (arrayCompra) => {
+const pintarTotalCompra = () => {
     totalCompra.textContent = '';
 
     const clonTemplateTotalCompra = templateTotalCompra.firstElementChild.cloneNode(true);
 
-    clonTemplateTotalCompra.querySelector('.card .card-body p.lead span').textContent = devolverTotalCompra(arrayCompra);
+    // -------------------- Calcular los totales en js y no en el objeto para seguir un orden lógico
+    clonTemplateTotalCompra.querySelector('.card .card-body p.lead span').textContent = devolverTotalCompra();
 
     fragmentTotalCompra.appendChild(clonTemplateTotalCompra);
     totalCompra.appendChild(fragmentTotalCompra);
@@ -112,7 +108,15 @@ document.addEventListener('click', (e) => {
         crearItem(item);
     }
 
+    if(fuenteEvento.matches('#carrito li div .btn.btn-sm.btn-success')) {
+        crearItem(item);
+    }
+
+    if(fuenteEvento.matches('#carrito li div .btn.btn-sm.btn-danger')) {
+        console.log('Disminuir cantidad');
+    }
+
     if(fuenteEvento.matches('#total-compra .card .card-body .btn.btn-outline-primary')) {
-        console.log('Compra finalizada')
+        console.log('Compra finalizada');
     }
 });
