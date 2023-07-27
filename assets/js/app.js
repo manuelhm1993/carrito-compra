@@ -58,8 +58,8 @@ const pintarCarrito = () => {
 
         // -------------------- Botones de control de cantidad se capturan y se les agregan los datasets
         clonTemplateItemCarrito.querySelectorAll('li div .btn.btn-sm').forEach((boton) => {
-            boton.setAttribute('data-item', item.id);
-            boton.setAttribute('data-precio', item.precio);
+            boton.dataset.item = item.id;
+            boton.setAttribute('data-precio', item.precio);// -------------------- Ambas hacen lo mismo
         });
 
         fragmentCarrito.appendChild(clonTemplateItemCarrito);
