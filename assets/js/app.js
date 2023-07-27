@@ -21,22 +21,44 @@ const crearItem = (item) => {
         id: item.descripcion,
         descripcion: item.descripcion,
         cantidad: 1,
-        precio: item.precio
+        precio: item.precio,
+        total: 0
     };
 
     guardarCarrito(nuevoItem);
     leerCarrito(carritoArray);
 };
 
+const devolverIndiceItem = (nuevoItem) => {
+    return carritoArray.findIndex((item) => item.id === nuevoItem.id);
+};
+
 const guardarCarrito = (nuevoItem) => {
     // -------------------- Comprobar si el producto seleccionado existe en el carrito
-    const indiceItem = carritoArray.findIndex((item) => item.id === nuevoItem.id);
+    const indiceItem = devolverIndiceItem(nuevoItem);
 
     // -------------------- Si el item no existe en el carrito, se agrega al final en caso contrario incrementa la cantidad
-    (indiceItem === -1) ? carritoArray.push(nuevoItem) : carritoArray[indiceItem].cantidad++;
+    if(indiceItem === -1) {
+        carritoArray.push(nuevoItem);
+
+        const indiceAgregado = devolverIndiceItem(nuevoItem);
+        
+        carritoArray[indiceAgregado].total = carritoArray[indiceAgregado].cantidad * nuevoItem.precio;
+    }
+    else {
+        carritoArray[indiceItem].cantidad++;
+
+        // -------------------- Luego de modificar la cantidad, se calcula cantidad * precio para el total
+        carritoArray[indiceItem].total = carritoArray[indiceItem].cantidad * nuevoItem.precio;
+    }
 };
 
 const leerCarrito = (arrayCompra) => {
+    pintarCarrito(arrayCompra);
+    pintarTotalCompra(arrayCompra);
+};
+
+const pintarCarrito = (arrayCompra) => {
     // -------------------- Formatear el carrito
     carrito.textContent = '';
     
@@ -47,7 +69,7 @@ const leerCarrito = (arrayCompra) => {
 
         clonTemplateItemCarrito.querySelector('li span.lead').textContent = item.descripcion;
         clonTemplateItemCarrito.querySelector('li span.badge').textContent = item.cantidad;
-        clonTemplateItemCarrito.querySelector('li div p.lead span').textContent = item.precio;
+        clonTemplateItemCarrito.querySelector('li div p.lead span').textContent = item.total;
 
         fragmentCarrito.appendChild(clonTemplateItemCarrito);
     });
@@ -55,22 +77,42 @@ const leerCarrito = (arrayCompra) => {
     carrito.appendChild(fragmentCarrito);
 };
 
-// -------------------- Delegacion de eventos para los botones del contenedor
-contenedorMain.addEventListener('click', (e) => {
+const devolverTotalCompra = (arrayCompra) => {
+    let totalCompra = 0;
+
+    arrayCompra.forEach((item) => {
+        totalCompra += item.total;
+    });
+
+    return totalCompra;
+};
+
+const pintarTotalCompra = (arrayCompra) => {
+    totalCompra.textContent = '';
+
+    const clonTemplateTotalCompra = templateTotalCompra.firstElementChild.cloneNode(true);
+
+    clonTemplateTotalCompra.querySelector('.card .card-body p.lead span').textContent = devolverTotalCompra(arrayCompra);
+
+    fragmentTotalCompra.appendChild(clonTemplateTotalCompra);
+    totalCompra.appendChild(fragmentTotalCompra);
+};
+
+// -------------------- Delegacion de eventos se usa el document para delegar el click a todas las secciones
+document.addEventListener('click', (e) => {
     const fuenteEvento = e.target;
 
     const item = {
         descripcion: fuenteEvento.dataset.item,
-        precio: fuenteEvento.dataset.precio
+        precio: parseFloat(fuenteEvento.dataset.precio)
     };
 
-    if(fuenteEvento.classList.value === 'btn btn-outline-primary') {
+    // Sustituye: fuenteEvento.classList.value === 'btn btn-outline-primary' con un selector más específico
+    if(fuenteEvento.matches('main.container .card .card-body .btn.btn-outline-primary')) {
         crearItem(item);
     }
-});
 
-totalCompra.addEventListener('click', (e) => {
-    if(e.target.classList.value === 'btn btn-outline-primary') {
+    if(fuenteEvento.matches('#total-compra .card .card-body .btn.btn-outline-primary')) {
         console.log('Compra finalizada')
     }
 });
