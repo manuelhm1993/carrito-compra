@@ -12,14 +12,14 @@ const templateTotalCompra = document.querySelector('#template-total-compra').con
 const fragmentTotalCompra = document.createDocumentFragment();
 
 // -------------------- Crear un array global que almacena la compra
-const carritoArray = [];
+let carritoArray = [];
 
 // -------------------- Declaracion de funciones
 const crearItem = (item) => {
     // -------------------- Crear el nuevo item
     const nuevoItem = {
-        id: item.descripcion,
-        descripcion: item.descripcion,
+        id: item.id,
+        descripcion: item.id,
         cantidad: 1,
         precio: item.precio
     };
@@ -28,20 +28,11 @@ const crearItem = (item) => {
     leerCarrito();
 };
 
-// -------------------- Comprobar si el producto seleccionado existe en el carrito
-const devolverIndiceItem = (id) => carritoArray.findIndex((item) => item.id === id);
-
-// -------------------- Incrementa la cantidad del item seleccionado
-const aumentarCantidad = (indiceItem) => carritoArray[indiceItem].cantidad++;
-
-// -------------------- Disminuye la cantidad del item seleccionado
-const disminuirCantidad = (indiceItem) => carritoArray[indiceItem].cantidad--;
-
 // -------------------- Si el item no existe en el carrito, se agrega al final en caso contrario incrementa la cantidad
 const guardarCarrito = (nuevoItem) => {
-    const indiceItem = devolverIndiceItem(nuevoItem.id);
+    const indiceItem = carritoArray.findIndex((item) => item.id === nuevoItem.id);
 
-    (indiceItem === -1) ? carritoArray.push(nuevoItem) : aumentarCantidad(indiceItem);
+    (indiceItem === -1) ? carritoArray.push(nuevoItem) : carritoArray[indiceItem].cantidad++;
 };
 
 // -------------------- Recorre el carritoArray y pinta los items en el DOM
@@ -102,13 +93,27 @@ const pintarTotalCompra = () => {
     totalCompra.appendChild(fragmentTotalCompra);
 };
 
+// -------------------- Comprobar si el producto seleccionado existe en el carrito
+const devolverIndiceItem = (id) => carritoArray.findIndex((item) => item.id === id);
+
+// -------------------- Sobreescribe el array aumentando la cantidad del item seleccionado
+const aumentarCantidad = (id) => {
+    carritoArray = carritoArray.map((item) => {
+        if(item.id === id) item.cantidad++;
+        return item;
+    });
+};
+
+// -------------------- Disminuye la cantidad del item seleccionado
+const disminuirCantidad = (indiceItem) => carritoArray[indiceItem].cantidad--;
+
 // -------------------- Delegacion de eventos se usa el document para delegar el click a todas las secciones
 document.addEventListener('click', (e) => {
     const fuenteEvento = e.target;
 
     // -------------------- Crea un objeto item con sus datasets
     const item = {
-        descripcion: fuenteEvento.dataset.item,
+        id: fuenteEvento.dataset.item,
         precio: parseFloat(fuenteEvento.dataset.precio)
     };
 
@@ -119,13 +124,13 @@ document.addEventListener('click', (e) => {
 
     // -------------------- Incrementa la cantidad y formatea el DOM
     if(fuenteEvento.matches('#carrito li div .btn.btn-sm.btn-success')) {
-        aumentarCantidad(devolverIndiceItem(item.descripcion));
+        aumentarCantidad(item.id);
         leerCarrito();
     }
 
     // -------------------- Decrementa la cantidad y formatea el DOM
     if(fuenteEvento.matches('#carrito li div .btn.btn-sm.btn-danger')) {
-        const indiceItem = devolverIndiceItem(item.descripcion);
+        const indiceItem = devolverIndiceItem(item.id);
 
         disminuirCantidad(indiceItem);
 
