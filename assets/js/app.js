@@ -28,19 +28,29 @@ const crearItem = (item) => {
     leerCarrito();
 };
 
-const guardarCarrito = (nuevoItem) => {
-    // -------------------- Comprobar si el producto seleccionado existe en el carrito
-    const indiceItem = carritoArray.findIndex((item) => item.id === nuevoItem.id);
+// -------------------- Comprobar si el producto seleccionado existe en el carrito
+const devolverIndiceItem = (id) => carritoArray.findIndex((item) => item.id === id);
 
-    // -------------------- Si el item no existe en el carrito, se agrega al final en caso contrario incrementa la cantidad
-    (indiceItem === -1) ? carritoArray.push(nuevoItem) : carritoArray[indiceItem].cantidad++;
+// -------------------- Incrementa la cantidad del item seleccionado
+const aumentarCantidad = (indiceItem) => carritoArray[indiceItem].cantidad++;
+
+// -------------------- Disminuye la cantidad del item seleccionado
+const disminuirCantidad = (indiceItem) => carritoArray[indiceItem].cantidad--;
+
+// -------------------- Si el item no existe en el carrito, se agrega al final en caso contrario incrementa la cantidad
+const guardarCarrito = (nuevoItem) => {
+    const indiceItem = devolverIndiceItem(nuevoItem.id);
+
+    (indiceItem === -1) ? carritoArray.push(nuevoItem) : aumentarCantidad(indiceItem);
 };
 
+// -------------------- Recorre el carritoArray y pinta los items en el DOM
 const leerCarrito = () => {
     pintarCarrito();
     pintarTotalCompra();
 };
 
+// -------------------- Recorre el carritoArray y pinta la sección del carrito
 const pintarCarrito = () => {
     // -------------------- Formatear el carrito
     carrito.textContent = '';
@@ -68,6 +78,7 @@ const pintarCarrito = () => {
     carrito.appendChild(fragmentCarrito);
 };
 
+// -------------------- Recorre el carritoArray y calcula el total de la compra
 const devolverTotalCompra = () => {
     let totalCompra = 0;
 
@@ -78,6 +89,7 @@ const devolverTotalCompra = () => {
     return totalCompra;
 };
 
+// -------------------- Recorre el carritoArray y pinta la sección de footer con los totales
 const pintarTotalCompra = () => {
     totalCompra.textContent = '';
 
@@ -94,6 +106,7 @@ const pintarTotalCompra = () => {
 document.addEventListener('click', (e) => {
     const fuenteEvento = e.target;
 
+    // -------------------- Crea un objeto item con sus datasets
     const item = {
         descripcion: fuenteEvento.dataset.item,
         precio: parseFloat(fuenteEvento.dataset.precio)
@@ -104,12 +117,24 @@ document.addEventListener('click', (e) => {
         crearItem(item);
     }
 
+    // -------------------- Incrementa la cantidad y formatea el DOM
     if(fuenteEvento.matches('#carrito li div .btn.btn-sm.btn-success')) {
-        crearItem(item);
+        aumentarCantidad(devolverIndiceItem(item.descripcion));
+        leerCarrito();
     }
 
+    // -------------------- Decrementa la cantidad y formatea el DOM
     if(fuenteEvento.matches('#carrito li div .btn.btn-sm.btn-danger')) {
-        console.log('Disminuir cantidad');
+        const indiceItem = devolverIndiceItem(item.descripcion);
+
+        disminuirCantidad(indiceItem);
+
+        // -------------------- Si la cantidad es = 0, se elimina el item del array
+        if(carritoArray[indiceItem].cantidad === 0) {
+            carritoArray.splice(indiceItem, 1);
+        }
+
+        leerCarrito();
     }
 
     if(fuenteEvento.matches('#total-compra .card .card-body .btn.btn-outline-primary')) {
