@@ -25,7 +25,6 @@ const crearItem = (item) => {
     };
 
     guardarCarrito(nuevoItem);
-    leerCarrito();
 };
 
 // -------------------- Si el item no existe en el carrito, se agrega al final en caso contrario incrementa la cantidad
@@ -93,9 +92,6 @@ const pintarTotalCompra = () => {
     totalCompra.appendChild(fragmentTotalCompra);
 };
 
-// -------------------- Comprobar si el producto seleccionado existe en el carrito
-const devolverIndiceItem = (id) => carritoArray.findIndex((item) => item.id === id);
-
 // -------------------- Sobreescribe el array aumentando la cantidad del item seleccionado
 const aumentarCantidad = (id) => {
     carritoArray = carritoArray.map((item) => {
@@ -104,8 +100,17 @@ const aumentarCantidad = (id) => {
     });
 };
 
-// -------------------- Disminuye la cantidad del item seleccionado
-const disminuirCantidad = (indiceItem) => carritoArray[indiceItem].cantidad--;
+// -------------------- Disminuye la cantidad del item seleccionado y lo saca del array si cantidad es 0
+const disminuirCantidad = (id) => {
+    carritoArray = carritoArray.filter((item) => {
+        if(item.id === id) {
+            item.cantidad--;
+
+            if(item.cantidad === 0) return;
+        }
+        return item;
+    });
+}
 
 // -------------------- Delegacion de eventos se usa el document para delegar el click a todas las secciones
 document.addEventListener('click', (e) => {
@@ -120,6 +125,7 @@ document.addEventListener('click', (e) => {
     // Sustituye: fuenteEvento.classList.value === 'btn btn-outline-primary' con un selector más específico
     if(fuenteEvento.matches('main.container .card .card-body .btn.btn-outline-primary')) {
         crearItem(item);
+        leerCarrito();
     }
 
     // -------------------- Incrementa la cantidad y formatea el DOM
@@ -130,15 +136,7 @@ document.addEventListener('click', (e) => {
 
     // -------------------- Decrementa la cantidad y formatea el DOM
     if(fuenteEvento.matches('#carrito li div .btn.btn-sm.btn-danger')) {
-        const indiceItem = devolverIndiceItem(item.id);
-
-        disminuirCantidad(indiceItem);
-
-        // -------------------- Si la cantidad es = 0, se elimina el item del array
-        if(carritoArray[indiceItem].cantidad === 0) {
-            carritoArray.splice(indiceItem, 1);
-        }
-
+        disminuirCantidad(item.id);
         leerCarrito();
     }
 
