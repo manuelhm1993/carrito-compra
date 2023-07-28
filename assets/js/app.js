@@ -8,8 +8,9 @@ const fragmentCarrito = document.createDocumentFragment();
 
 // -------------------- Template total compra
 const totalCompra = document.querySelector('#total-compra');
+
+// -------------------- Si es un único nodo sin ciclos, no se necesita usar fragment, se puede agregar directo al DOM
 const templateTotalCompra = document.querySelector('#template-total-compra').content;
-const fragmentTotalCompra = document.createDocumentFragment();
 
 // -------------------- Crear un array global que almacena la compra
 let carritoArray = [];
@@ -68,13 +69,15 @@ const pintarCarrito = () => {
     carrito.appendChild(fragmentCarrito);
 };
 
-// -------------------- Recorre el carritoArray y calcula el total de la compra
+// -------------------- Reduce el carritoArray y calcula el total de la compra
 const devolverTotalCompra = () => {
-    let totalCompra = 0;
+    // -------------------- Se da el valor inicial 0 para que el acumulador parta de un número y no un objeto
+    const valorInicial = 0;
 
-    carritoArray.forEach((item) => {
-        totalCompra += (item.cantidad * item.precio);
-    });
+    const totalCompra = carritoArray.reduce((acumulador, valorActual) => {
+        // -------------------- Parte de 0 y luego se hace el cálculo con las propiedades del objeto
+        return acumulador + (valorActual.cantidad * valorActual.precio);
+    }, valorInicial);
 
     return totalCompra;
 };
@@ -88,8 +91,8 @@ const pintarTotalCompra = () => {
     // -------------------- Calcular los totales en js y no en el objeto para seguir un orden lógico
     clonTemplateTotalCompra.querySelector('.card .card-body p.lead span').textContent = devolverTotalCompra();
 
-    fragmentTotalCompra.appendChild(clonTemplateTotalCompra);
-    totalCompra.appendChild(fragmentTotalCompra);
+    // -------------------- Si es un único nodo sin ciclos, no se necesita usar fragment, se puede agregar directo al DOM
+    totalCompra.appendChild(clonTemplateTotalCompra);
 };
 
 // -------------------- Sobreescribe el array aumentando la cantidad del item seleccionado
@@ -111,6 +114,10 @@ const disminuirCantidad = (id) => {
         return item;
     });
 }
+
+const formatearFooter = () => {
+    if(carritoArray.length === 0) totalCompra.textContent = '';
+};
 
 // -------------------- Delegacion de eventos se usa el document para delegar el click a todas las secciones
 document.addEventListener('click', (e) => {
@@ -138,6 +145,7 @@ document.addEventListener('click', (e) => {
     if(fuenteEvento.matches('#carrito li div .btn.btn-sm.btn-danger')) {
         disminuirCantidad(item.id);
         leerCarrito();
+        formatearFooter();
     }
 
     if(fuenteEvento.matches('#total-compra .card .card-body .btn.btn-outline-primary')) {
