@@ -1,5 +1,6 @@
 // --------------- Variables
 const carritoCompra = [];
+const carritoObjeto = {};
 let productosAPI;
 
 // --------------- Funciones
@@ -52,7 +53,7 @@ const capitalize = (palabra) => (palabra.charAt(0).toUpperCase() + palabra.slice
 // --------------- Agrega un nuevo item al carrito
 const agregarItem = (id) => {
     // --------------- Busca el producto en la BBDD, pero se debe parsear ya que el dataset es un string
-    const itemSolicitado = productosAPI.find((producto) => producto.id === parseFloat(id));
+    const itemSolicitado = productosAPI.find((producto) => producto.id === parseInt(id, 10));
 
     if(itemSolicitado) {
         // --------------- Si el producto está disponible, se busca en el carrito si está agregaado
@@ -74,6 +75,25 @@ const agregarItem = (id) => {
     console.log(carritoCompra);
 };
 
+const agregarObjeto = (id) => {
+    const productoSolicitado = productosAPI.find((producto) => producto.id === parseInt(id, 10));
+    
+    if(productoSolicitado) {
+        if(carritoObjeto.hasOwnProperty(id)) {
+            carritoObjeto[id].cantidad++;
+            carritoObjeto[id].total = carritoObjeto[id].cantidad * carritoObjeto[id].price;
+        }
+        else {
+            carritoObjeto[id] = productoSolicitado;
+            carritoObjeto[id].cantidad = 1;
+            carritoObjeto[id].total = productoSolicitado;
+        }
+        
+    }
+
+    console.log(carritoObjeto);
+};
+
 // --------------- Delegación de eventos
 // 
 // --------------- Al cargar el documento
@@ -90,6 +110,7 @@ document.addEventListener('click', (e) => {
 
     // --------------- Comrpobar si el elemento el atributo data
     if(fuenteEvento.hasAttribute('data-producto-id')) {
-        agregarItem(fuenteEvento.dataset.productoId);
+        // agregarItem(fuenteEvento.dataset.productoId);
+        agregarObjeto(fuenteEvento.dataset.productoId);
     }
 });
