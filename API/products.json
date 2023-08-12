@@ -2,7 +2,7 @@
     {
         "id": 1,
         "image": "https://picsum.photos/id/0/600",
-        "name": "programación",
+        "name": "Desarrollo",
         "price": 500
     },
     {
@@ -26,7 +26,7 @@
     {
         "id": 5,
         "image": "https://picsum.photos/id/40/600",
-        "name": "organización",
+        "name": "gestión",
         "price": 10
     },
     {

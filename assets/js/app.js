@@ -27,14 +27,12 @@ const renderizarCatalogo = (productos) => {
     productos.forEach((producto) => {
         const clonCatalogoTemplate = catalogoTemplate.firstElementChild.cloneNode(true);
 
-        const botonAgregar = clonCatalogoTemplate.querySelector('.card .card-body .btn');
-
-        botonAgregar.dataset.producto = producto.id;
-        botonAgregar.dataset.precio = producto.price;
-
         clonCatalogoTemplate.querySelector('.card .card-img-top').src = producto.image;
         clonCatalogoTemplate.querySelector('.card .card-body .card-title').textContent = capitalize(producto.name);
         clonCatalogoTemplate.querySelector('.card .card-body .card-text span').textContent = producto.price;
+
+        // --------------- Establece el atributo dataset dinámicamente para garantizar mayor seguridad
+        clonCatalogoTemplate.querySelector('.card .card-body .btn').dataset.productoId = producto.id;
 
         fragmentCatalogo.appendChild(clonCatalogoTemplate);
     });
@@ -60,8 +58,7 @@ document.addEventListener('click', (e) => {
     const fuenteEvento = e.target;
 
     // --------------- Comrpobar si el elemento el atributo data
-    if(fuenteEvento.hasAttribute('data-producto')) {
-        console.log(fuenteEvento.dataset.producto);
-        console.log(fuenteEvento.dataset.precio);
+    if(fuenteEvento.hasAttribute('data-producto-id')) {
+        console.log(fuenteEvento.dataset.productoId);
     }
 });
