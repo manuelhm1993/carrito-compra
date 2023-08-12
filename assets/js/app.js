@@ -22,8 +22,15 @@ const renderizarCatalogo = (productos) => {
     const catalogoTemplate = document.querySelector('#catalogo-template').content;
     const fragmentCatalogo = document.createDocumentFragment();
 
+    catalogo.textContent = '';
+
     productos.forEach((producto) => {
         const clonCatalogoTemplate = catalogoTemplate.firstElementChild.cloneNode(true);
+
+        const botonAgregar = clonCatalogoTemplate.querySelector('.card .card-body .btn');
+
+        botonAgregar.dataset.producto = producto.id;
+        botonAgregar.dataset.precio = producto.price;
 
         clonCatalogoTemplate.querySelector('.card .card-img-top').src = producto.image;
         clonCatalogoTemplate.querySelector('.card .card-body .card-title').textContent = capitalize(producto.name);
@@ -46,4 +53,15 @@ document.addEventListener('DOMContentLoaded', (e) => {
     const url = './API/products.json';
 
     fetchProducts(url);
+});
+
+// --------------- Al hacer click
+document.addEventListener('click', (e) => {
+    const fuenteEvento = e.target;
+
+    // --------------- Comrpobar si el elemento el atributo data
+    if(fuenteEvento.hasAttribute('data-producto')) {
+        console.log(fuenteEvento.dataset.producto);
+        console.log(fuenteEvento.dataset.precio);
+    }
 });
