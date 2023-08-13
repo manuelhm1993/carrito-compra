@@ -114,7 +114,10 @@ const renderizarFooterCarritoCompra = (carritoCompra) => {
 const capitalize = (palabra) => (palabra.charAt(0).toUpperCase() + palabra.slice(1));
 
 // --------------- Formatea el valor recibido a moneda USA
-const formatearPrecio = (value) => value.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+const formatearPrecio = (value, code = 'en-us', money = 'USD') => value.toLocaleString(code, { 
+    style: 'currency', 
+    currency: money 
+});
 
 // --------------- Agrega un nuevo item al carrito o incrementa su cantidad
 const agregarItem = (id) => {
