@@ -1,7 +1,8 @@
 // --------------- Variables
+let productosAPI;
+
 const carritoCompra = [];
 const carritoObjeto = {};
-let productosAPI;
 
 // --------------- Funciones
 // 
@@ -62,13 +63,11 @@ const agregarItem = (id) => {
         // --------------- Si el producto solicitado no está en el carrito se agrega
         if(!item) {
             itemSolicitado.cantidad = 1;
-            itemSolicitado.total = itemSolicitado.price;
             carritoCompra.push(itemSolicitado);
         }
         // --------------- Si el producto solicitado está en el carrito se incrementa la cantidad
         else {
             item.cantidad++;
-            item.total = item.cantidad * item.price;
         }
     }
 
@@ -79,16 +78,13 @@ const agregarObjeto = (id) => {
     const productoSolicitado = productosAPI.find((producto) => producto.id === parseInt(id, 10));
     
     if(productoSolicitado) {
-        if(carritoObjeto.hasOwnProperty(id)) {
-            carritoObjeto[id].cantidad++;
-            carritoObjeto[id].total = carritoObjeto[id].cantidad * carritoObjeto[id].price;
+        if(carritoObjeto.hasOwnProperty(productoSolicitado.id)) {
+            carritoObjeto[productoSolicitado.id].cantidad++;
         }
         else {
-            carritoObjeto[id] = productoSolicitado;
-            carritoObjeto[id].cantidad = 1;
-            carritoObjeto[id].total = productoSolicitado;
+            carritoObjeto[productoSolicitado.id] = productoSolicitado;
+            carritoObjeto[productoSolicitado.id].cantidad = 1;
         }
-        
     }
 
     console.log(carritoObjeto);

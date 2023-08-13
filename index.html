@@ -22,7 +22,7 @@
         </main>
 
         <!-- Carrito -->
-        <section>
+        <section class="my-5">
             <h4>Carrito de compras</h4>
 
             <table class="table">
@@ -37,18 +37,14 @@
                 </thead>
                 
                 <tbody id="carrito"></tbody>
+
+                <tfoot id="footer-carrito">
+                  <tr>
+                    <th scope="row" colspan="5">Carrito vacío - comience a comprar!</th>
+                  </tr>
+                </tfoot>
             </table>
         </section>
-
-        <footer id="total">
-            <p class="fw-bold">Carrito vacío - comience a comprar!</p>
-            <!-- <div class="row text-center">
-                <div class="col-3">Total productos</div>
-                <div class="col-3">4</div>
-                <div class="col-3"><button class="btn btn-danger">Vaciar todo</button></div>
-                <div class="col-3">$<span>1400</span></div>
-            </div> -->
-        </footer>
     </div>
 
     <!-- Templates -->
@@ -78,6 +74,18 @@
             </td>
             <td>$<span>200</span></td>
           </tr>
+    </template>
+
+    <!-- Total compra -->
+    <template id="footer-carrito-template">
+      <tr>
+        <th scope="row" colspan="2">Total productos</th>
+        <td>4</td>
+        <td>
+          <button class="btn btn-danger">Vaciar carrito</button>
+        </td>
+        <td>$<span>1400</span></td>
+      </tr>
     </template>
 
     <script
