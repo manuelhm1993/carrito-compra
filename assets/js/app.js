@@ -44,7 +44,7 @@ const renderizarCatalogo = (productos) => {
 
         clonCatalogoTemplate.querySelector('.card .card-img-top').src = producto.image;
         clonCatalogoTemplate.querySelector('.card .card-body .card-title').textContent = capitalize(producto.name);
-        clonCatalogoTemplate.querySelector('.card .card-body .card-text span').textContent = producto.price;
+        clonCatalogoTemplate.querySelector('.card .card-body .card-text span').textContent = formatearPrecio(producto.price);
 
         // --------------- Establece el atributo dataset dinámicamente para garantizar mayor seguridad
         clonCatalogoTemplate.querySelector('.card .card-body .btn').dataset.productoId = producto.id;
@@ -66,7 +66,7 @@ const renderizarCarritoCompra = (carrito) => {
         const clonSeccionCarritoTemplate = seccionCarritoTemplate.firstElementChild.cloneNode(true);
 
         clonSeccionCarritoTemplate.querySelector('th').textContent = item.id;
-        clonSeccionCarritoTemplate.querySelector('th span').textContent = (item.cantidad * item.price);
+        clonSeccionCarritoTemplate.querySelector('th span').textContent = formatearPrecio((item.cantidad * item.price));
 
         // --------------- Obtener los td e iterarlos con foreach capturando el index
         clonSeccionCarritoTemplate.querySelectorAll('td').forEach((col, index) => {
@@ -98,9 +98,9 @@ const renderizarFooterCarritoCompra = (carritoCompra) => {
     const carritoArray = Object.values(carritoCompra);
 
     // --------------- Acumula los totales de cada producto para hacer un total total
-    clonFooterCarritoTemplate.querySelector('th span').textContent = carritoArray.reduce((acc, item) => {
-        return acc + (item.cantidad * item.price);
-    }, 0);
+    const total = carritoArray.reduce((acc, item) =>  (acc + (item.cantidad * item.price)), 0);
+
+    clonFooterCarritoTemplate.querySelector('th span').textContent = formatearPrecio(total);
 
     // --------------- Acumula las cantidades totales de cada producto para hacer un total de items
     clonFooterCarritoTemplate.querySelector('td').textContent = carritoArray.reduce((acc, item) => {
@@ -112,6 +112,9 @@ const renderizarFooterCarritoCompra = (carritoCompra) => {
 
 // --------------- Colocar la primera letra en mayúscula
 const capitalize = (palabra) => (palabra.charAt(0).toUpperCase() + palabra.slice(1));
+
+// --------------- Formatea el valor recibido a moneda USA
+const formatearPrecio = (value) => value.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
 
 // --------------- Agrega un nuevo item al carrito o incrementa su cantidad
 const agregarItem = (id) => {
