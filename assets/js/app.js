@@ -132,15 +132,35 @@ const agregarItem = (id) => {
     renderizarFooterCarritoCompra(carritoCompra);
 };
 
+// --------------- Vaciar el carrito de la compra
 const vaciarCarritoCompra = () => {
-    if(confirm('¿Desea vaciar el carrito de compra?')) {
-        carritoCompra = {};
+    // --------------- Mensaje de advertencia para confirmar la acción
+    Swal.fire({
+        title: '¿Desea vaciar el carrito de compra?',
+        text: "La compra quedará en cero.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Si, vaciar',
+        cancelButtonText: 'No, cancelar'
+    })
+    .then((result) => {
+        if (result.isConfirmed) {
+            carritoCompra = {};
     
-        seccionCarrito.textContent = '';
-        footerCarrito.textContent = '';
-    
-        footerCarrito.appendChild(footerCarritoVacio);
-    }
+            seccionCarrito.textContent = '';
+            footerCarrito.textContent = '';
+        
+            footerCarrito.appendChild(footerCarritoVacio);
+            
+            Swal.fire(
+                'Carrito vaciado',
+                'Su compra fue eliminada.',
+                'success'
+            );
+        }
+    });
 };
 
 // --------------- Delegación de eventos
