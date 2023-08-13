@@ -48,6 +48,36 @@ const renderizarCatalogo = (productos) => {
     catalogo.appendChild(fragmentCatalogo);
 };
 
+const renderizarCarritoObjeto = (carrito) => {
+    const seccionCarrito = document.querySelector('#carrito');
+    const seccionCarritoTemplate = document.querySelector('#carrito-template').content;
+    const fragmentCarrito = document.createDocumentFragment();
+
+    seccionCarrito.textContent = '';
+
+    Object.values(carrito).forEach((item) => {
+        const clonSeccionCarritoTemplate = seccionCarritoTemplate.firstElementChild.cloneNode(true);
+
+        clonSeccionCarritoTemplate.querySelector('th').textContent = item.id;
+        clonSeccionCarritoTemplate.querySelector('th span').textContent = (item.cantidad * item.price);
+
+        clonSeccionCarritoTemplate.querySelectorAll('td').forEach((col, index) => {
+            switch(index) {
+                case 0:
+                    col.textContent = capitalize(item.name);
+                    break;
+                case 1:
+                    col.textContent = item.cantidad;
+                    break;
+            }
+        });
+        
+        fragmentCarrito.appendChild(clonSeccionCarritoTemplate);
+    });
+
+    seccionCarrito.appendChild(fragmentCarrito);
+};
+
 // --------------- Colocar la primera letra en mayúscula
 const capitalize = (palabra) => (palabra.charAt(0).toUpperCase() + palabra.slice(1));
 
@@ -72,6 +102,7 @@ const agregarItem = (id) => {
     }
 
     console.log(carritoCompra);
+    renderizarCarrito(carritoCompra);
 };
 
 const agregarObjeto = (id) => {
@@ -88,6 +119,7 @@ const agregarObjeto = (id) => {
     }
 
     console.log(carritoObjeto);
+    renderizarCarritoObjeto(carritoObjeto);
 };
 
 // --------------- Delegación de eventos

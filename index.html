@@ -69,23 +69,23 @@
             <td>Café</td>
             <td>1</td>
             <td>
-                <button class="btn btn-success btn-sm">+</button>
-                <button class="btn btn-danger btn-sm">-</button>
+                <button class="btn btn-success btn-sm" aria-label="Agregar">+</button>
+                <button class="btn btn-danger btn-sm" aria-label="Quitar">-</button>
             </td>
-            <td>$<span>200</span></td>
-          </tr>
+            <th scope="row">$<span>200</span></th>
+        </tr>
     </template>
 
     <!-- Total compra -->
     <template id="footer-carrito-template">
-      <tr>
-        <th scope="row" colspan="2">Total productos</th>
-        <td>4</td>
-        <td>
-          <button class="btn btn-danger">Vaciar carrito</button>
-        </td>
-        <td>$<span>1400</span></td>
-      </tr>
+        <tr>
+            <th scope="row" colspan="2">Total productos</th>
+            <td>4</td>
+            <td>
+                <button class="btn btn-danger" id="vaciar-carrito">Vaciar carrito</button>
+            </td>
+            <th scope="row">$<span>1400</span></th>
+        </tr>
     </template>
 
     <script
