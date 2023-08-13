@@ -127,9 +127,28 @@ const agregarItem = (id) => {
         }
     }
 
-    console.log(carritoCompra);
     renderizarCarritoCompra(carritoCompra);
     renderizarFooterCarritoCompra(carritoCompra);
+};
+
+const quitarItem = (id) => {
+    const item = carritoCompra[id];
+
+    if((Object.values(carritoCompra).length === 1) && (item.cantidad === 1)) {
+        vaciarCarritoCompra();
+    }
+    else {
+        if(item.cantidad > 1) {
+            item.cantidad--;
+            carritoCompra[id] = item;
+        }
+        else {
+            delete carritoCompra[id];
+        }
+    
+        renderizarCarritoCompra(carritoCompra);
+        renderizarFooterCarritoCompra(carritoCompra);
+    }
 };
 
 // --------------- Vaciar el carrito de la compra
@@ -177,11 +196,15 @@ document.addEventListener('DOMContentLoaded', (e) => {
 document.addEventListener('click', (e) => {
     const fuenteEvento = e.target;
 
-    // --------------- Comrpobar si el elemento el atributo data
+    // --------------- Agregar o quitar item del carrito
     if(fuenteEvento.hasAttribute('data-producto-id')) {
         if(fuenteEvento.hasAttribute('aria-label')) {
             if(fuenteEvento.getAttribute('aria-label') === "Agregar") {
                 agregarItem(fuenteEvento.dataset.productoId);
+            }
+
+            if(fuenteEvento.getAttribute('aria-label') === "Quitar") {
+                quitarItem(fuenteEvento.dataset.productoId);
             }
         }
         else {
