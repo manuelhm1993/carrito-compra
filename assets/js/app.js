@@ -1,6 +1,6 @@
 // --------------- Variables
 let productosAPI;
-const carritoCompra = {};
+let carritoCompra = {};
 
 // --------------- Sección carrito compra
 const seccionCarrito = document.querySelector('#carrito');
@@ -9,6 +9,7 @@ const seccionCarritoTemplate = document.querySelector('#carrito-template').conte
 // --------------- Footer carrito compra
 const footerCarrito = document.querySelector('#footer-carrito');
 const footerCarritoTemplate = document.querySelector('#footer-carrito-template').content;
+const footerCarritoVacio = document.querySelector('#footer-carrito tr');
 
 // --------------- Funciones
 // 
@@ -54,6 +55,7 @@ const renderizarCatalogo = (productos) => {
     catalogo.appendChild(fragmentCatalogo);
 };
 
+// --------------- Renderizar la sección del carrito de la compra con los items
 const renderizarCarritoCompra = (carrito) => {
     seccionCarrito.textContent = '';
 
@@ -88,6 +90,7 @@ const renderizarCarritoCompra = (carrito) => {
     seccionCarrito.appendChild(fragmentCarrito);
 };
 
+// --------------- Renderizar el footer del carrito de la compra con los totales
 const renderizarFooterCarritoCompra = (carritoCompra) => {
     footerCarrito.textContent = '';
 
@@ -110,6 +113,7 @@ const renderizarFooterCarritoCompra = (carritoCompra) => {
 // --------------- Colocar la primera letra en mayúscula
 const capitalize = (palabra) => (palabra.charAt(0).toUpperCase() + palabra.slice(1));
 
+// --------------- Agrega un nuevo item al carrito o incrementa su cantidad
 const agregarItem = (id) => {
     const productoSolicitado = productosAPI.find((producto) => producto.id === parseInt(id, 10));
     
@@ -126,6 +130,17 @@ const agregarItem = (id) => {
     console.log(carritoCompra);
     renderizarCarritoCompra(carritoCompra);
     renderizarFooterCarritoCompra(carritoCompra);
+};
+
+const vaciarCarritoCompra = () => {
+    if(confirm('¿Desea vaciar el carrito de compra?')) {
+        carritoCompra = {};
+    
+        seccionCarrito.textContent = '';
+        footerCarrito.textContent = '';
+    
+        footerCarrito.appendChild(footerCarritoVacio);
+    }
 };
 
 // --------------- Delegación de eventos
@@ -152,5 +167,10 @@ document.addEventListener('click', (e) => {
         else {
             agregarItem(fuenteEvento.dataset.productoId);
         }
+    }
+
+    // --------------- Vaciar carrito
+    if(fuenteEvento.id === 'vaciar-carrito') {
+        vaciarCarritoCompra();
     }
 });
