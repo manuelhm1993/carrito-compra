@@ -1,154 +1,225 @@
-// -------------------- Declaracion de variables
-const contenedorMain = document.querySelector('main.container');
+// --------------- Variables
+let productosAPI;
+let carritoCompra = {};
 
-// -------------------- Template carrito
-const carrito = document.querySelector('#carrito');
-const templateItemCarrito = document.querySelector('#template-item-carrito').content;
-const fragmentCarrito = document.createDocumentFragment();
+// --------------- Sección carrito compra
+const seccionCarrito = document.querySelector('#carrito');
+const seccionCarritoTemplate = document.querySelector('#carrito-template').content;
 
-// -------------------- Template total compra
-const totalCompra = document.querySelector('#total-compra');
+// --------------- Footer carrito compra
+const footerCarrito = document.querySelector('#footer-carrito');
+const footerCarritoTemplate = document.querySelector('#footer-carrito-template').content;
+const footerCarritoVacio = document.querySelector('#footer-carrito tr');
 
-// -------------------- Si es un único nodo sin ciclos, no se necesita usar fragment, se puede agregar directo al DOM
-const templateTotalCompra = document.querySelector('#template-total-compra').content;
+// --------------- Funciones
+// 
+// --------------- Obtener los productos del catálogo
+const fetchProducts = async (url) => {
+    try {
+        const res = await fetch(url);
+        const data = await res.json();
 
-// -------------------- Crear un array global que almacena la compra
-let carritoArray = [];
+        console.table(data);
 
-// -------------------- Declaracion de funciones
-const crearItem = (item) => {
-    // -------------------- Crear el nuevo item
-    const nuevoItem = {
-        id: item.id,
-        descripcion: item.id,
-        cantidad: 1,
-        precio: item.precio
-    };
+        productosAPI = data;
 
-    guardarCarrito(nuevoItem);
+        renderizarCatalogo(data);
+    } catch (error) {
+        console.log(error);
+    } finally {
+
+    }
 };
 
-// -------------------- Si el item no existe en el carrito, se agrega al final en caso contrario incrementa la cantidad
-const guardarCarrito = (nuevoItem) => {
-    const indiceItem = carritoArray.findIndex((item) => item.id === nuevoItem.id);
+// --------------- Renderizar el catálogo de productos en cards
+const renderizarCatalogo = (productos) => {
+    const catalogo = document.querySelector('#catalogo');
+    const catalogoTemplate = document.querySelector('#catalogo-template').content;
+    const fragmentCatalogo = document.createDocumentFragment();
 
-    (indiceItem === -1) ? carritoArray.push(nuevoItem) : carritoArray[indiceItem].cantidad++;
+    catalogo.textContent = '';
+
+    productos.forEach((producto) => {
+        const clonCatalogoTemplate = catalogoTemplate.firstElementChild.cloneNode(true);
+
+        clonCatalogoTemplate.querySelector('.card .card-img-top').src = producto.image;
+        clonCatalogoTemplate.querySelector('.card .card-body .card-title').textContent = capitalize(producto.name);
+        clonCatalogoTemplate.querySelector('.card .card-body .card-text span').textContent = formatearPrecio(producto.price);
+
+        // --------------- Establece el atributo dataset dinámicamente para garantizar mayor seguridad
+        clonCatalogoTemplate.querySelector('.card .card-body .btn').dataset.productoId = producto.id;
+
+        fragmentCatalogo.appendChild(clonCatalogoTemplate);
+    });
+
+    catalogo.appendChild(fragmentCatalogo);
 };
 
-// -------------------- Recorre el carritoArray y pinta los items en el DOM
-const leerCarrito = () => {
-    pintarCarrito();
-    pintarTotalCompra();
-};
+// --------------- Renderizar la sección del carrito de la compra con los items
+const renderizarCarritoCompra = (carrito) => {
+    seccionCarrito.textContent = '';
 
-// -------------------- Recorre el carritoArray y pinta la sección del carrito
-const pintarCarrito = () => {
-    // -------------------- Formatear el carrito
-    carrito.textContent = '';
-    
-    // -------------------- Iterar el array y pintar los elementos en el DOM usando el template
-    carritoArray.forEach(item => {
-        // -------------------- Como son varios nodos, no se puede usar ni firstElementChild ni lastElementChild
-        const clonTemplateItemCarrito = templateItemCarrito.cloneNode(true);
+    const fragmentCarrito = document.createDocumentFragment();
 
-        clonTemplateItemCarrito.querySelector('li span.lead').textContent = item.descripcion;
-        clonTemplateItemCarrito.querySelector('li span.badge').textContent = item.cantidad;
+    // --------------- Convertir el objeto en array para poder iterarlo con foreach
+    Object.values(carrito).forEach((item) => {
+        const clonSeccionCarritoTemplate = seccionCarritoTemplate.firstElementChild.cloneNode(true);
 
-        // -------------------- Calcular los totales en js y no en el objeto para seguir un orden lógico
-        clonTemplateItemCarrito.querySelector('li div p.lead span').textContent = item.cantidad * item.precio;
+        clonSeccionCarritoTemplate.querySelector('th').textContent = item.id;
+        clonSeccionCarritoTemplate.querySelector('th span').textContent = formatearPrecio((item.cantidad * item.price));
 
-        // -------------------- Botones de control de cantidad se capturan y se les agregan los datasets
-        clonTemplateItemCarrito.querySelectorAll('li div .btn.btn-sm').forEach((boton) => {
-            boton.dataset.item = item.id;
-            boton.setAttribute('data-precio', item.precio);// -------------------- Ambas hacen lo mismo
+        // --------------- Obtener los td e iterarlos con foreach capturando el index
+        clonSeccionCarritoTemplate.querySelectorAll('td').forEach((col, index) => {
+            switch(index) {
+                case 0:
+                    col.textContent = capitalize(item.name);
+                    break;
+                case 1:
+                    col.textContent = item.cantidad;
+                    break;
+                case 2:
+                    col.querySelector('button[aria-label="Agregar"]').dataset.productoId = item.id;
+                    col.querySelector('button[aria-label="Quitar"]').dataset.productoId = item.id;
+                    break;
+            }
         });
-
-        fragmentCarrito.appendChild(clonTemplateItemCarrito);
+        
+        fragmentCarrito.appendChild(clonSeccionCarritoTemplate);
     });
 
-    carrito.appendChild(fragmentCarrito);
+    seccionCarrito.appendChild(fragmentCarrito);
 };
 
-// -------------------- Reduce el carritoArray y calcula el total de la compra
-const devolverTotalCompra = () => {
-    // -------------------- Se da el valor inicial 0 para que el acumulador parta de un número y no un objeto
-    const valorInicial = 0;
+// --------------- Renderizar el footer del carrito de la compra con los totales
+const renderizarFooterCarritoCompra = (carritoCompra) => {
+    footerCarrito.textContent = '';
 
-    const totalCompra = carritoArray.reduce((acumulador, valorActual) => {
-        // -------------------- Parte de 0 y luego se hace el cálculo con las propiedades del objeto
-        return acumulador + (valorActual.cantidad * valorActual.precio);
-    }, valorInicial);
+    const clonFooterCarritoTemplate = footerCarritoTemplate.firstElementChild.cloneNode(true);
+    const carritoArray = Object.values(carritoCompra);
 
-    return totalCompra;
+    // --------------- Acumula los totales de cada producto para hacer un total total
+    const total = carritoArray.reduce((acc, item) =>  (acc + (item.cantidad * item.price)), 0);
+
+    clonFooterCarritoTemplate.querySelector('th span').textContent = formatearPrecio(total);
+
+    // --------------- Acumula las cantidades totales de cada producto para hacer un total de items
+    clonFooterCarritoTemplate.querySelector('td').textContent = carritoArray.reduce((acc, item) => {
+        return acc + item.cantidad;
+    }, 0);
+
+    footerCarrito.appendChild(clonFooterCarritoTemplate);
 };
 
-// -------------------- Recorre el carritoArray y pinta la sección de footer con los totales
-const pintarTotalCompra = () => {
-    totalCompra.textContent = '';
+// --------------- Colocar la primera letra en mayúscula
+const capitalize = (palabra) => (palabra.charAt(0).toUpperCase() + palabra.slice(1));
 
-    const clonTemplateTotalCompra = templateTotalCompra.firstElementChild.cloneNode(true);
+// --------------- Formatea el valor recibido a moneda USA
+const formatearPrecio = (value, code = 'en-us', money = 'USD') => value.toLocaleString(code, { 
+    style: 'currency', 
+    currency: money 
+});
 
-    // -------------------- Calcular los totales en js y no en el objeto para seguir un orden lógico
-    clonTemplateTotalCompra.querySelector('.card .card-body p.lead span').textContent = devolverTotalCompra();
-
-    // -------------------- Si es un único nodo sin ciclos, no se necesita usar fragment, se puede agregar directo al DOM
-    totalCompra.appendChild(clonTemplateTotalCompra);
-};
-
-// -------------------- Sobreescribe el array aumentando la cantidad del item seleccionado
-const aumentarCantidad = (id) => {
-    carritoArray = carritoArray.map((item) => {
-        if(item.id === id) item.cantidad++;
-        return item;
-    });
-};
-
-// -------------------- Disminuye la cantidad del item seleccionado y lo saca del array si cantidad es 0
-const disminuirCantidad = (id) => {
-    carritoArray = carritoArray.filter((item) => {
-        if(item.id === id) {
-            item.cantidad--;
-
-            if(item.cantidad === 0) return;
+// --------------- Agrega un nuevo item al carrito o incrementa su cantidad
+const agregarItem = (id) => {
+    const productoSolicitado = productosAPI.find((producto) => producto.id === parseInt(id, 10));
+    
+    if(productoSolicitado) {
+        if(carritoCompra.hasOwnProperty(productoSolicitado.id)) {
+            carritoCompra[productoSolicitado.id].cantidad++;
         }
-        return item;
-    });
-}
+        else {
+            carritoCompra[productoSolicitado.id] = productoSolicitado;
+            carritoCompra[productoSolicitado.id].cantidad = 1;
+        }
+    }
 
-const formatearFooter = () => {
-    if(carritoArray.length === 0) totalCompra.textContent = '';
+    renderizarCarritoCompra(carritoCompra);
+    renderizarFooterCarritoCompra(carritoCompra);
 };
 
-// -------------------- Delegacion de eventos se usa el document para delegar el click a todas las secciones
+const quitarItem = (id) => {
+    const item = carritoCompra[id];
+
+    if((Object.values(carritoCompra).length === 1) && (item.cantidad === 1)) {
+        vaciarCarritoCompra();
+    }
+    else {
+        if(item.cantidad > 1) {
+            item.cantidad--;
+            carritoCompra[id] = item;
+        }
+        else {
+            delete carritoCompra[id];
+        }
+    
+        renderizarCarritoCompra(carritoCompra);
+        renderizarFooterCarritoCompra(carritoCompra);
+    }
+};
+
+// --------------- Vaciar el carrito de la compra
+const vaciarCarritoCompra = () => {
+    // --------------- Mensaje de advertencia para confirmar la acción
+    Swal.fire({
+        title: '¿Desea vaciar el carrito de compra?',
+        text: "La compra quedará en cero.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Si, vaciar',
+        cancelButtonText: 'No, cancelar'
+    })
+    .then((result) => {
+        if (result.isConfirmed) {
+            carritoCompra = {};
+    
+            seccionCarrito.textContent = '';
+            footerCarrito.textContent = '';
+        
+            footerCarrito.appendChild(footerCarritoVacio);
+            
+            Swal.fire(
+                'Carrito vaciado',
+                'Su compra fue eliminada.',
+                'success'
+            );
+        }
+    });
+};
+
+// --------------- Delegación de eventos
+// 
+// --------------- Al cargar el documento
+document.addEventListener('DOMContentLoaded', (e) => {
+    // --------------- La ruta relativa se cuenta a partir del index.html
+    const url = './API/products.json';
+
+    fetchProducts(url);
+});
+
+// --------------- Al hacer click
 document.addEventListener('click', (e) => {
     const fuenteEvento = e.target;
 
-    // -------------------- Crea un objeto item con sus datasets
-    const item = {
-        id: fuenteEvento.dataset.item,
-        precio: parseFloat(fuenteEvento.dataset.precio)
-    };
+    // --------------- Agregar o quitar item del carrito
+    if(fuenteEvento.hasAttribute('data-producto-id')) {
+        if(fuenteEvento.hasAttribute('aria-label')) {
+            if(fuenteEvento.getAttribute('aria-label') === "Agregar") {
+                agregarItem(fuenteEvento.dataset.productoId);
+            }
 
-    // Sustituye: fuenteEvento.classList.value === 'btn btn-outline-primary' con un selector más específico
-    if(fuenteEvento.matches('main.container .card .card-body .btn.btn-outline-primary')) {
-        crearItem(item);
-        leerCarrito();
+            if(fuenteEvento.getAttribute('aria-label') === "Quitar") {
+                quitarItem(fuenteEvento.dataset.productoId);
+            }
+        }
+        else {
+            agregarItem(fuenteEvento.dataset.productoId);
+        }
     }
 
-    // -------------------- Incrementa la cantidad y formatea el DOM
-    if(fuenteEvento.matches('#carrito li div .btn.btn-sm.btn-success')) {
-        aumentarCantidad(item.id);
-        leerCarrito();
-    }
-
-    // -------------------- Decrementa la cantidad y formatea el DOM
-    if(fuenteEvento.matches('#carrito li div .btn.btn-sm.btn-danger')) {
-        disminuirCantidad(item.id);
-        leerCarrito();
-        formatearFooter();
-    }
-
-    if(fuenteEvento.matches('#total-compra .card .card-body .btn.btn-outline-primary')) {
-        console.log('Compra finalizada');
+    // --------------- Vaciar carrito
+    if(fuenteEvento.id === 'vaciar-carrito') {
+        vaciarCarritoCompra();
     }
 });
