@@ -113,11 +113,19 @@ const renderizarFooterCarritoCompra = (carritoCompra) => {
 // --------------- Colocar la primera letra en mayúscula
 const capitalize = (palabra) => (palabra.charAt(0).toUpperCase() + palabra.slice(1));
 
-// --------------- Formatea el valor recibido a moneda USA
-const formatearPrecio = (value, code = 'en-us', money = 'USD') => value.toLocaleString(code, { 
-    style: 'currency', 
-    currency: money 
-});
+// --------------- Formatea el valor recibido a la moneda especificada
+const formatearPrecio = (value, localCode = 'en-us', currency = 'USD', minDec = 2, maxDec = 2, rounding = 5) => {
+    const valorFormateado = value.toLocaleString(
+        localCode, { 
+        style: 'currency', 
+        currency: currency,
+        minimumFractionDigits: minDec,
+        maximumFractionDigits: maxDec,
+        roundingIncrement: rounding,
+    });
+
+    return valorFormateado;
+};
 
 // --------------- Agrega un nuevo item al carrito o incrementa su cantidad
 const agregarItem = (id) => {
@@ -137,6 +145,7 @@ const agregarItem = (id) => {
     renderizarFooterCarritoCompra(carritoCompra);
 };
 
+// --------------- Elimina el item seleccionado o vacía el carrito si solo hay un elemento
 const quitarItem = (id) => {
     const item = carritoCompra[id];
 
