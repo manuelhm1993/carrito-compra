@@ -1,7 +1,14 @@
 // --------------- Variables
 let productosAPI;
-
 const carritoCompra = {};
+
+// --------------- Sección carrito compra
+const seccionCarrito = document.querySelector('#carrito');
+const seccionCarritoTemplate = document.querySelector('#carrito-template').content;
+
+// --------------- Footer carrito compra
+const footerCarrito = document.querySelector('#footer-carrito');
+const footerCarritoTemplate = document.querySelector('#footer-carrito-template').content;
 
 // --------------- Funciones
 // 
@@ -48,18 +55,18 @@ const renderizarCatalogo = (productos) => {
 };
 
 const renderizarCarritoCompra = (carrito) => {
-    const seccionCarrito = document.querySelector('#carrito');
-    const seccionCarritoTemplate = document.querySelector('#carrito-template').content;
-    const fragmentCarrito = document.createDocumentFragment();
-
     seccionCarrito.textContent = '';
 
+    const fragmentCarrito = document.createDocumentFragment();
+
+    // --------------- Convertir el objeto en array para poder iterarlo con foreach
     Object.values(carrito).forEach((item) => {
         const clonSeccionCarritoTemplate = seccionCarritoTemplate.firstElementChild.cloneNode(true);
 
         clonSeccionCarritoTemplate.querySelector('th').textContent = item.id;
         clonSeccionCarritoTemplate.querySelector('th span').textContent = (item.cantidad * item.price);
 
+        // --------------- Obtener los td e iterarlos con foreach capturando el index
         clonSeccionCarritoTemplate.querySelectorAll('td').forEach((col, index) => {
             switch(index) {
                 case 0:
@@ -81,6 +88,25 @@ const renderizarCarritoCompra = (carrito) => {
     seccionCarrito.appendChild(fragmentCarrito);
 };
 
+const renderizarFooterCarritoCompra = (carritoCompra) => {
+    footerCarrito.textContent = '';
+
+    const clonFooterCarritoTemplate = footerCarritoTemplate.firstElementChild.cloneNode(true);
+    const carritoArray = Object.values(carritoCompra);
+
+    // --------------- Acumula los totales de cada producto para hacer un total total
+    clonFooterCarritoTemplate.querySelector('th span').textContent = carritoArray.reduce((acc, item) => {
+        return acc + (item.cantidad * item.price);
+    }, 0);
+
+    // --------------- Acumula las cantidades totales de cada producto para hacer un total de items
+    clonFooterCarritoTemplate.querySelector('td').textContent = carritoArray.reduce((acc, item) => {
+        return acc + item.cantidad;
+    }, 0);
+
+    footerCarrito.appendChild(clonFooterCarritoTemplate);
+};
+
 // --------------- Colocar la primera letra en mayúscula
 const capitalize = (palabra) => (palabra.charAt(0).toUpperCase() + palabra.slice(1));
 
@@ -99,6 +125,7 @@ const agregarItem = (id) => {
 
     console.log(carritoCompra);
     renderizarCarritoCompra(carritoCompra);
+    renderizarFooterCarritoCompra(carritoCompra);
 };
 
 // --------------- Delegación de eventos
