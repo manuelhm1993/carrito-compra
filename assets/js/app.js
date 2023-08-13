@@ -1,8 +1,7 @@
 // --------------- Variables
 let productosAPI;
 
-const carritoCompra = [];
-const carritoObjeto = {};
+const carritoCompra = {};
 
 // --------------- Funciones
 // 
@@ -48,7 +47,7 @@ const renderizarCatalogo = (productos) => {
     catalogo.appendChild(fragmentCatalogo);
 };
 
-const renderizarCarritoObjeto = (carrito) => {
+const renderizarCarritoCompra = (carrito) => {
     const seccionCarrito = document.querySelector('#carrito');
     const seccionCarritoTemplate = document.querySelector('#carrito-template').content;
     const fragmentCarrito = document.createDocumentFragment();
@@ -69,6 +68,10 @@ const renderizarCarritoObjeto = (carrito) => {
                 case 1:
                     col.textContent = item.cantidad;
                     break;
+                case 2:
+                    col.querySelector('button[aria-label="Agregar"]').dataset.productoId = item.id;
+                    col.querySelector('button[aria-label="Quitar"]').dataset.productoId = item.id;
+                    break;
             }
         });
         
@@ -81,45 +84,21 @@ const renderizarCarritoObjeto = (carrito) => {
 // --------------- Colocar la primera letra en mayúscula
 const capitalize = (palabra) => (palabra.charAt(0).toUpperCase() + palabra.slice(1));
 
-// --------------- Agrega un nuevo item al carrito
 const agregarItem = (id) => {
-    // --------------- Busca el producto en la BBDD, pero se debe parsear ya que el dataset es un string
-    const itemSolicitado = productosAPI.find((producto) => producto.id === parseInt(id, 10));
-
-    if(itemSolicitado) {
-        // --------------- Si el producto está disponible, se busca en el carrito si está agregaado
-        const item = carritoCompra.find((item) => item.id === itemSolicitado.id);
-
-        // --------------- Si el producto solicitado no está en el carrito se agrega
-        if(!item) {
-            itemSolicitado.cantidad = 1;
-            carritoCompra.push(itemSolicitado);
+    const productoSolicitado = productosAPI.find((producto) => producto.id === parseInt(id, 10));
+    
+    if(productoSolicitado) {
+        if(carritoCompra.hasOwnProperty(productoSolicitado.id)) {
+            carritoCompra[productoSolicitado.id].cantidad++;
         }
-        // --------------- Si el producto solicitado está en el carrito se incrementa la cantidad
         else {
-            item.cantidad++;
+            carritoCompra[productoSolicitado.id] = productoSolicitado;
+            carritoCompra[productoSolicitado.id].cantidad = 1;
         }
     }
 
     console.log(carritoCompra);
-    renderizarCarrito(carritoCompra);
-};
-
-const agregarObjeto = (id) => {
-    const productoSolicitado = productosAPI.find((producto) => producto.id === parseInt(id, 10));
-    
-    if(productoSolicitado) {
-        if(carritoObjeto.hasOwnProperty(productoSolicitado.id)) {
-            carritoObjeto[productoSolicitado.id].cantidad++;
-        }
-        else {
-            carritoObjeto[productoSolicitado.id] = productoSolicitado;
-            carritoObjeto[productoSolicitado.id].cantidad = 1;
-        }
-    }
-
-    console.log(carritoObjeto);
-    renderizarCarritoObjeto(carritoObjeto);
+    renderizarCarritoCompra(carritoCompra);
 };
 
 // --------------- Delegación de eventos
@@ -138,7 +117,13 @@ document.addEventListener('click', (e) => {
 
     // --------------- Comrpobar si el elemento el atributo data
     if(fuenteEvento.hasAttribute('data-producto-id')) {
-        // agregarItem(fuenteEvento.dataset.productoId);
-        agregarObjeto(fuenteEvento.dataset.productoId);
+        if(fuenteEvento.hasAttribute('aria-label')) {
+            if(fuenteEvento.getAttribute('aria-label') === "Agregar") {
+                agregarItem(fuenteEvento.dataset.productoId);
+            }
+        }
+        else {
+            agregarItem(fuenteEvento.dataset.productoId);
+        }
     }
 });
