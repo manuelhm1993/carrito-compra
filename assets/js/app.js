@@ -1,6 +1,7 @@
 // --------------- Variables
-let productosAPI = null;
 let carritoCompra = {};
+const localCode = 'en-us'; 
+const currency = 'USD';
 
 // --------------- Sección carrito compra
 const seccionCarrito = document.querySelector('#carrito');
@@ -18,8 +19,6 @@ const fetchProducts = async (url) => {
     try {
         const res = await fetch(url);
         const data = await res.json();
-
-        productosAPI = data;
 
         renderizarCatalogo(data);
     } catch (error) {
@@ -112,7 +111,7 @@ const renderizarFooterCarritoCompra = (carritoCompra) => {
 const capitalize = (palabra) => (palabra.charAt(0).toUpperCase() + palabra.slice(1));
 
 // --------------- Formatea el valor recibido a la moneda especificada
-const formatearPrecio = (value, localCode = 'en-us', currency = 'USD', minDec = 2, maxDec = 2, rounding = 5) => {
+const formatearPrecio = (value, minDec = 2, maxDec = 2, rounding = 5) => {
     const valorFormateado = value.toLocaleString(
         localCode, { 
         style: 'currency', 
@@ -125,19 +124,55 @@ const formatearPrecio = (value, localCode = 'en-us', currency = 'USD', minDec = 
     return valorFormateado;
 };
 
-// --------------- Agrega un nuevo item al carrito o incrementa su cantidad
-const agregarItem = (id) => {
-    const productoSolicitado = productosAPI.find((producto) => producto.id === parseInt(id, 10));
-    
-    if(productoSolicitado) {
-        if(carritoCompra.hasOwnProperty(productoSolicitado.id)) {
-            carritoCompra[productoSolicitado.id].cantidad++;
-        }
-        else {
-            carritoCompra[productoSolicitado.id] = productoSolicitado;
-            carritoCompra[productoSolicitado.id].cantidad = 1;
-        }
+// --------------- Quita el formato moneda y devuelve el valor numérico
+const quitarFormatoPrecio = (precioString) => {
+    let precio;
+    let regex;
+
+    switch(localCode) {
+        case 'es-ve':
+            // --------------- Solo coincide con números
+            regex = /[0-9\.]+,[0-9]+/ig;
+
+            // --------------- Elimina todo lo que no sea un número y devuelve la parte entera y la decimal unidas por . y ,
+            precio = precioString.match(regex);
+
+            // --------------- Quita los puntos en la parte entera y cambia la coma de la parte decimal por un punto
+            precio = precio[0].split('.').join('').split(',').join('.');
+            break;
+        case 'en-us':
+            // --------------- Solo coincide con números
+            regex = /[0-9,]+\.[0-9]+/ig;
+
+            // --------------- Elimina todo lo que no sea un número y devuelve la parte entera y la decimal unidas por . y ,
+            precio = precioString.match(regex);
+
+            // --------------- Quita las comas de la parte entera
+            precio = precio[0].split(',').join('');
+            break;
     }
+
+    // --------------- Devuelve el precio en formato float
+    return parseFloat(precio);
+};
+
+// --------------- Agrega un nuevo item al carrito o incrementa su cantidad
+const agregarItem = (nodo) => {
+    // --------------- Crear un objeto producto con la información de la card
+    const productoSolicitado = {
+        id: nodo.querySelector('.btn.btn-success').dataset.productoId,
+        name: nodo.querySelector('.card-title').textContent,
+        price: quitarFormatoPrecio(nodo.querySelector('.card-text span').textContent),
+        cantidad: 1
+    };
+    
+    // --------------- Si el producto existe en el carrito, se incrementa su cantidad
+    if(carritoCompra.hasOwnProperty(productoSolicitado.id)) {
+        productoSolicitado.cantidad = carritoCompra[productoSolicitado.id].cantidad + 1;
+    }
+
+    // --------------- Clonar el objeto dentro del índice
+    carritoCompra[productoSolicitado.id] = { ...productoSolicitado };
 
     renderizarCarritoCompra(carritoCompra);
     renderizarFooterCarritoCompra(carritoCompra);
@@ -215,7 +250,11 @@ document.body.firstElementChild.addEventListener('click', (e) => {
     if(fuenteEvento.hasAttribute('data-producto-id')) {
         if(fuenteEvento.hasAttribute('aria-label')) {
             if(fuenteEvento.getAttribute('aria-label') === "Agregar") {
-                agregarItem(fuenteEvento.dataset.productoId);
+                const nodoPadre = document.querySelector(
+                    `#catalogo button[data-producto-id="${fuenteEvento.dataset.productoId}"]`
+                ).parentElement;
+
+                agregarItem(nodoPadre);
             }
 
             if(fuenteEvento.getAttribute('aria-label') === "Quitar") {
@@ -223,7 +262,12 @@ document.body.firstElementChild.addEventListener('click', (e) => {
             }
         }
         else {
-            agregarItem(fuenteEvento.dataset.productoId);
+            /** 
+             * Una forma elegante de construir los objetos del carrito sería enviar el fuenteEvento.parentElement
+             * De esa manera enviamos el div.card-body que es su elemento padre y con esa información construir el objeto
+             * Luego se agrega al carrito, de ese modo se evitaría una consulta a la data
+             * */ 
+            agregarItem(fuenteEvento.parentElement);
         }
     }
 
