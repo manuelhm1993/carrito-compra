@@ -1,5 +1,5 @@
 // --------------- Variables
-let productosAPI;
+let productosAPI = null;
 let carritoCompra = {};
 
 // --------------- Sección carrito compra
@@ -18,8 +18,6 @@ const fetchProducts = async (url) => {
     try {
         const res = await fetch(url);
         const data = await res.json();
-
-        console.table(data);
 
         productosAPI = data;
 
@@ -208,7 +206,9 @@ document.addEventListener('DOMContentLoaded', (e) => {
 });
 
 // --------------- Al hacer click
-document.addEventListener('click', (e) => {
+document.body.addEventListener('click', (e) => {
+    e.stopPropagation();
+
     const fuenteEvento = e.target;
 
     // --------------- Agregar o quitar item del carrito
