@@ -206,7 +206,7 @@ document.addEventListener('DOMContentLoaded', (e) => {
 });
 
 // --------------- Al hacer click
-document.body.addEventListener('click', (e) => {
+document.body.firstElementChild.addEventListener('click', (e) => {
     e.stopPropagation();
 
     const fuenteEvento = e.target;
