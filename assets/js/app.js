@@ -1,5 +1,3 @@
-// --------------- Variables
-let productosAPI = null;
 let carritoCompra = {};
 
 // --------------- Sección carrito compra
@@ -18,8 +16,6 @@ const fetchProducts = async (url) => {
     try {
         const res = await fetch(url);
         const data = await res.json();
-
-        productosAPI = data;
 
         renderizarCatalogo(data);
     } catch (error) {
@@ -126,8 +122,12 @@ const formatearPrecio = (value, localCode = 'en-us', currency = 'USD', minDec = 
 };
 
 // --------------- Agrega un nuevo item al carrito o incrementa su cantidad
-const agregarItem = (id) => {
-    const productoSolicitado = productosAPI.find((producto) => producto.id === parseInt(id, 10));
+const agregarItem = (nodo) => {
+    const productoSolicitado = {
+        id: nodo.querySelector('.btn.btn-success').dataset.productoId,
+        name: nodo.querySelector('.card-title').textContent,
+        price: parseFloat(nodo.querySelector('.card-text span').textContent.slice(1))
+    };
     
     if(productoSolicitado) {
         if(carritoCompra.hasOwnProperty(productoSolicitado.id)) {
@@ -206,7 +206,7 @@ document.addEventListener('DOMContentLoaded', (e) => {
 });
 
 // --------------- Al hacer click
-document.body.addEventListener('click', (e) => {
+document.body.firstElementChild.addEventListener('click', (e) => {
     e.stopPropagation();
 
     const fuenteEvento = e.target;
@@ -215,7 +215,11 @@ document.body.addEventListener('click', (e) => {
     if(fuenteEvento.hasAttribute('data-producto-id')) {
         if(fuenteEvento.hasAttribute('aria-label')) {
             if(fuenteEvento.getAttribute('aria-label') === "Agregar") {
-                agregarItem(fuenteEvento.dataset.productoId);
+                const nodoPadre = document.querySelector(
+                    '#catalogo button[data-producto-id="' + fuenteEvento.dataset.productoId + '"]'
+                    ).parentElement;
+
+                agregarItem(nodoPadre);
             }
 
             if(fuenteEvento.getAttribute('aria-label') === "Quitar") {
@@ -223,7 +227,12 @@ document.body.addEventListener('click', (e) => {
             }
         }
         else {
-            agregarItem(fuenteEvento.dataset.productoId);
+            /** 
+             * Una forma elegante de construir los objetos del carrito sería enviar el fuenteEvento.parentElement
+             * De esa manera enviamos el div.card-body que es su elemento padre y con esa información construir el objeto
+             * Luego se agrega al carrito, de ese modo se evitaría una consulta a la data
+             * */ 
+            agregarItem(fuenteEvento.parentElement);
         }
     }
 
