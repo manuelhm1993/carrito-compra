@@ -3,36 +3,36 @@
         "id": 1,
         "image": "https://picsum.photos/id/0/600",
         "name": "desarrollo",
-        "price": 500
+        "price": 500.55
     },
     {
         "id": 2,
         "image": "https://picsum.photos/id/10/600",
         "name": "viajes",
-        "price": 300
+        "price": 300.50
     },
     {
         "id": 3,
         "image": "https://picsum.photos/id/20/600",
         "name": "scrum",
-        "price": 100
+        "price": 100.55
     },
     {
         "id": 4,
         "image": "https://picsum.photos/id/30/600",
         "name": "tutorías",
-        "price": 50
+        "price": 50.33
     },
     {
         "id": 5,
         "image": "https://picsum.photos/id/40/600",
         "name": "gestión",
-        "price": 10
+        "price": 10.45
     },
     {
         "id": 6,
         "image": "https://picsum.photos/id/50/600",
         "name": "marketing",
-        "price": 150
+        "price": 150.33
     }
 ]
