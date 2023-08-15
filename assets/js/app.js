@@ -226,8 +226,28 @@ const vaciarCarritoCompra = () => {
                 'Su compra fue eliminada.',
                 'success'
             );
+
+            // --------------- Si el carrito de compra está vacío, se quita su key de localStorage
+            localStorage.removeItem("carritoCompra");
         }
     });
+};
+
+const setCarritoLocalStorage = () => {
+    // --------------- Guardar el carrito de compra en el localStorage y actualizarlo en cada acción
+    localStorage.setItem('carritoCompra', JSON.stringify(carritoCompra));
+};
+
+const getCarritoLocalStorage = () => {
+    // --------------- Validar si el carrito de compra tiene información en localStorage
+    if(localStorage.getItem('carritoCompra')) {
+        // --------------- Convertir la data en JSON
+        carritoCompra = JSON.parse(localStorage.getItem('carritoCompra'));
+
+        // --------------- Renderizar el carrito de compras luego de recuperar la data
+        renderizarCarritoCompra(carritoCompra);
+        renderizarFooterCarritoCompra(carritoCompra);
+    }
 };
 
 // --------------- Delegación de eventos
@@ -238,6 +258,7 @@ document.addEventListener('DOMContentLoaded', (e) => {
     const url = './API/products.json';
 
     fetchProducts(url);
+    getCarritoLocalStorage();
 });
 
 // --------------- Al hacer click
@@ -269,6 +290,8 @@ document.body.firstElementChild.addEventListener('click', (e) => {
              * */ 
             agregarItem(fuenteEvento.parentElement);
         }
+
+        setCarritoLocalStorage();
     }
 
     // --------------- Vaciar carrito
