@@ -1,4 +1,4 @@
-# Carrito de compra MHenriquez
+# Carrito de compra MHenriquez 🛒
 
 Carrito de compra Frontend desarrollado en vanilla javascript, bootstrap, sweetalert2 y html5, listo para conectar con un backend. Puede ser tomado como base para proyectos pequeños y medianos, ya que se incluye el localStorage para guardar la información del lado del cliente.
 
